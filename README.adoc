@@ -1,0 +1,77 @@
+= AWS Dynamo demo
+
+== Run DynamoDB via podman
+----
+podman run -it \
+    --publish 8000:8000 \
+    amazon/dynamodb-local:1.11.477 \
+    -jar DynamoDBLocal.jar -inMemory -sharedDb
+----
+
+Acces http://localhost:8000/shell
+
+== How was the `aws-dynamodb-todo` project created
+
+[source,bash]
+----
+mvn io.quarkus.platform:quarkus-maven-plugin:2.4.2.Final:create \
+    -DprojectGroupId=dk.jarry.aws.dynamodb.todo \
+    -DprojectArtifactId=aws-dynamodb-todo \
+    -DclassName="dk.jarry.aws.dynamodb.ToDoResource" \
+    -Dpath="/todos" \
+    -Dextensions="resteasy,resteasy-jackson,amazon-dynamodb,resteasy-mutiny"
+cd aws-dynamodb-todo
+----
+
+== Create table in DynamoDB
+
+----
+var params = {
+    TableName: 'ToDos',
+    KeySchema: [{ AttributeName: 'uuid', KeyType: 'HASH' }],
+    AttributeDefinitions: [{  AttributeName: 'uuid', AttributeType: 'S', }],
+    ProvisionedThroughput: { ReadCapacityUnits: 1, WriteCapacityUnits: 1, }
+};
+
+dynamodb.createTable(params, function(err, data) {
+    if (err) ppJson(err);
+    else ppJson(data);
+
+});
+----
+
+[source,bash]
+----
+aws dynamodb create-table --table-name ToDos \
+                          --attribute-definitions AttributeName=subject,AttributeType=S \
+                          --key-schema AttributeName=subject,KeyType=HASH \
+                          --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1
+----
+
+== Delete table in DynamoDB
+
+----
+var params = {
+    TableName: 'ToDos'
+};
+
+dynamodb.deleteTable(params, function(err, data) {
+    if (err) ppJson(err);
+    else ppJson(data);
+
+});
+----
+
+== Tests from command line
+
+Create ToDo
+[source,bash]
+----
+curl -X POST http://localhost:8080/todos \
+	-H 'Accept: application/json' \
+	-H 'Content-Type: application/json' \
+	-d '{"subject":"Hello from Quarkus","body":"Content"}'
+----
+
+## Links
+https://quarkus.io/guides/amazon-dynamodb
