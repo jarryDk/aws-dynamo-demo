@@ -15,19 +15,28 @@ public class ToDoSyncService extends AbstractService {
 	@Inject
 	DynamoDbClient dynamoDB;
 
+	public ToDo create(ToDo toDo) {
+		dynamoDB.putItem(getPutItemRequest(toDo));
+		return toDo;
+	}
+
+	public ToDo read(String uuid) {
+		return ToDo.from(dynamoDB.getItem(getGetItemRequest(uuid)).item());
+	}
+	
+	public ToDo update(String uuid, ToDo toDo) {
+		dynamoDB.updateItem(getUpdateItemRequest(uuid, toDo));
+		return read(uuid);
+	}
+	
+	public void delete(String uuid) {
+		dynamoDB.deleteItem(getDeleteItemRequest(uuid));
+	}
+
 	public List<ToDo> findAll() {
-		return dynamoDB.scanPaginator(scanRequest()).items().stream() //
+		return dynamoDB.scanPaginator(getScanRequest()).items().stream() //
 				.map(ToDo::from) //
 				.collect(Collectors.toList());
 	}
-
-	public List<ToDo> add(ToDo toDo) {
-		dynamoDB.putItem(putRequest(toDo));
-		return findAll();
-	}
-
-	public ToDo get(String uuid) {
-		return ToDo.from(dynamoDB.getItem(getRequest(uuid)).item());
-	}
-
+	
 }

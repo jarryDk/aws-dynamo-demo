@@ -3,8 +3,10 @@ package dk.jarry.aws.dynamodb.todo.boundary;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
@@ -13,25 +15,36 @@ import io.smallrye.mutiny.Uni;
 
 @Path("/async-todos")
 public class ToDoAsyncResource {
- 
+
 	@Inject
 	ToDoAsyncService service;
 
+	@POST
+	public Uni<ToDo> create(ToDo toDo) {
+		return service.create(toDo);
+	}
+
 	@GET
-    public Uni<List<ToDo>> getAll() {
-        return service.findAll();
-    }
+	@Path("{uuid}")
+	public Uni<ToDo> read(@PathParam("uuid") String uuid) {
+		return service.read(uuid);
+	}
 
-    @GET
-    @Path("{uuid}")
-    public Uni<ToDo> getSingle(@PathParam("uuid") String uuid) {
-        return service.get(uuid);
-    }
+	@PUT
+	@Path("{uuid}")
+	public Uni<ToDo> update(@PathParam("uuid") String uuid, ToDo toDo) {
+		return service.update(uuid, toDo);
+	}
 
-    @POST
-    public Uni<List<ToDo>> add(ToDo toDo) {
-        return service.add(toDo)
-                .onItem().ignore().andSwitchTo(this::getAll);
-    }
+	@DELETE
+	@Path("{uuid}")
+	public void delete(@PathParam("uuid") String uuid) {
+		service.delete(uuid);
+	}
+
+	@GET
+	public Uni<List<ToDo>> getAll() {
+		return service.findAll();
+	}
 
 }
