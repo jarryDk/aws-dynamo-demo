@@ -14,12 +14,12 @@ Acces http://localhost:8000/shell
 
 [source,bash]
 ----
-mvn io.quarkus.platform:quarkus-maven-plugin:2.4.2.Final:create \
+mvn io.quarkus.platform:quarkus-maven-plugin:2.10.0.Final:create \
     -DprojectGroupId=dk.jarry.aws \
     -DprojectArtifactId=aws-dynamodb-todo \
     -DclassName="dk.jarry.aws.dynamodb.ToDoResource" \
     -Dpath="/todos" \
-    -Dextensions="resteasy,resteasy-jackson,amazon-dynamodb,resteasy-mutiny"
+    -Dextensions="quarkus-resteasy-reactive,quarkus-resteasy-reactive-jsonb,quarkus-amazon-dynamodb"
 cd aws-dynamodb-todo
 ----
 
@@ -27,7 +27,7 @@ cd aws-dynamodb-todo
 
 [source,bash]
 ----
-mvn io.quarkus.platform:quarkus-maven-plugin:2.4.2.Final:create \
+mvn io.quarkus.platform:quarkus-maven-plugin:2.10.0.Final:create \
     -DprojectGroupId=dk.jarry.aws \
     -DprojectArtifactId=aws-dynamodb-todo-st
     -Dpath="/todos" \
