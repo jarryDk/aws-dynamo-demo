@@ -2,11 +2,11 @@ package dk.jarry.aws.dynamodb.todo.entity;
 
 import java.time.ZonedDateTime;
 import java.util.Map;
-import java.util.UUID;
 
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 import dk.jarry.aws.dynamodb.todo.boundary.AbstractService;
+import dk.jarry.aws.dynamodb.todo.control.UUID;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
@@ -14,33 +14,30 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 public class ToDo {
 
 	@Schema(readOnly = true)
+	@UUID
 	public String uuid;
 
 	public String subject;
 	public String body;
 
-	@Schema(readOnly = true)
+	@Schema(readOnly = true, example = "2022-08-17T11:06:35.775362861+02:00[Europe/Copenhagen]")
 	public ZonedDateTime createdAt;
-	@Schema(readOnly = true)
+	@Schema(readOnly = true, example = "2022-08-17T11:06:35.775362861+02:00[Europe/Copenhagen]")
 	public ZonedDateTime updatedAt;
 
 	public ToDo() {
-		this.uuid = UUID.randomUUID().toString();
-		ZonedDateTime now = ZonedDateTime.now();
-		this.createdAt = now;
-		this.updatedAt = now;
 	}
 
 	public static ToDo from(Map<String, AttributeValue> item) {
-
-		System.out.println(item.size());
-		System.out.println(item.keySet());
-
 		ToDo toDo = new ToDo();
 		if (item != null && !item.isEmpty()) {
 			toDo.setUuid(item.get(AbstractService.TODO_UUID_COL).s());
-			toDo.setSubject(item.get(AbstractService.TODO_SUBJECT_COL).s());
-			toDo.setBody(item.get(AbstractService.TODO_BODY_COL).s());
+			if(item.containsKey(AbstractService.TODO_SUBJECT_COL)){
+				toDo.setSubject(item.get(AbstractService.TODO_SUBJECT_COL).s());
+			}
+			if(item.containsKey(AbstractService.TODO_BODY_COL)){
+				toDo.setBody(item.get(AbstractService.TODO_BODY_COL).s());
+			}
 			if(item.containsKey(AbstractService.TODO_CREATED_AT_COL)){
 				toDo.setCreatedAt(ZonedDateTime.parse(item.get(AbstractService.TODO_CREATED_AT_COL).s()));
 			}

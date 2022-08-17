@@ -14,9 +14,9 @@ import javax.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
-@Path("todos")
+@Path("async-todos")
 @RegisterRestClient(baseUri = "http://localhost:8080")
-public interface ToDoResourceClient {
+public interface ToDoAsyncResourceClient {
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)

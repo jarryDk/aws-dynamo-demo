@@ -1,10 +1,5 @@
 package dk.jarry.aws;
 
-import io.quarkus.test.junit.QuarkusTest;
-import org.junit.jupiter.api.Test;
-
-import dk.jarry.todo.control.ToDoResourceClient;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -14,13 +9,20 @@ import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.jboss.logging.Logger;
+import org.junit.jupiter.api.Test;
+
+import dk.jarry.todo.control.ToDoAsyncResourceClient;
+import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
-public class ToDoResourceTest {
+public class ToDoAsyncResourceTest {
+
+    public static final Logger LOG = Logger.getLogger(ToDoAsyncResourceTest.class);
 
     @Inject
     @RestClient
-    ToDoResourceClient resourceClient;
+    ToDoAsyncResourceClient resourceClient;
 
     @Test
     public void create() {
@@ -30,7 +32,13 @@ public class ToDoResourceTest {
         createObjectBuilder.add("body", "Body - test");
         JsonObject todoInput = createObjectBuilder.build();
 
+        LOG.info("todoInput : " + todoInput);
+        System.out.println("todoInput : " + todoInput);
+
         var todoOutput = this.resourceClient.create(todoInput);
+
+        LOG.info("todoOutput : " + todoOutput);
+        System.out.println("todoOutput : " + todoOutput);
 
         assertEquals(todoInput.getString("subject"), todoOutput.getString("subject"));
         assertEquals(todoInput.getString("body"), todoOutput.getString("body"));
